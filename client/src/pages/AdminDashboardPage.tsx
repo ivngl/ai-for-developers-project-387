@@ -5,6 +5,7 @@ import type { EventType } from '../api/eventTypes'
 import type { Booking } from '../api/bookings'
 import AdminLayout from '../components/AdminLayout'
 import EventTypeCard from '../components/EventTypeCard'
+import { Title, SimpleGrid, Table, Loader, Alert, Text } from '@mantine/core'
 
 export default function AdminDashboardPage() {
   const [eventTypes, setEventTypes] = useState<EventType[]>([])
@@ -41,49 +42,46 @@ export default function AdminDashboardPage() {
     }
   }
 
-  if (loading) return <AdminLayout><p>Loading...</p></AdminLayout>
-  if (error) return <AdminLayout><p style={{ color: 'red' }}>{error}</p></AdminLayout>
+  if (loading) return <AdminLayout><Loader /></AdminLayout>
+  if (error) return <AdminLayout><Alert color="red">{error}</Alert></AdminLayout>
 
   return (
     <AdminLayout>
-      <h2>Event Types</h2>
-      {eventTypes.length === 0 && <p>No event types yet.</p>}
-      {eventTypes.map((et) => (
-        <EventTypeCard key={et.id} eventType={et} admin onDelete={handleDelete} />
-      ))}
+      <Title order={2} mb="md">Event Types</Title>
+      {eventTypes.length === 0 && <Text>No event types yet.</Text>}
+      <SimpleGrid cols={{ base: 1, sm: 2 }}>
+        {eventTypes.map((et) => (
+          <EventTypeCard key={et.id} eventType={et} admin onDelete={handleDelete} />
+        ))}
+      </SimpleGrid>
 
-      <h2 style={{ marginTop: 40 }}>Upcoming Bookings</h2>
-      {bookings.length === 0 && <p>No bookings yet.</p>}
-      {bookings.map((b) => (
-        <div
-          key={b.id}
-          style={{
-            border: '1px solid #ddd',
-            borderRadius: 8,
-            padding: 16,
-            marginBottom: 12,
-          }}
-        >
-          <p>
-            <strong>Type:</strong> {b.eventType?.title || `#${b.eventTypeId}`}
-          </p>
-          <p>
-            <strong>Time:</strong>{' '}
-            {new Date(b.startTime).toLocaleString()} -{' '}
-            {new Date(b.endTime).toLocaleTimeString()}
-          </p>
-          {b.guestName && (
-            <p>
-              <strong>Guest:</strong> {b.guestName}
-            </p>
-          )}
-          {b.guestEmail && (
-            <p>
-              <strong>Email:</strong> {b.guestEmail}
-            </p>
-          )}
-        </div>
-      ))}
+      <Title order={2} mt="xl" mb="md">Upcoming Bookings</Title>
+      {bookings.length === 0 ? (
+        <Text>No bookings yet.</Text>
+      ) : (
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Type</Table.Th>
+              <Table.Th>Start</Table.Th>
+              <Table.Th>End</Table.Th>
+              <Table.Th>Name</Table.Th>
+              <Table.Th>Email</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {bookings.map((b) => (
+              <Table.Tr key={b.id}>
+                <Table.Td>{b.eventType?.title || `#${b.eventTypeId}`}</Table.Td>
+                <Table.Td>{new Date(b.startTime).toLocaleString()}</Table.Td>
+                <Table.Td>{new Date(b.endTime).toLocaleTimeString()}</Table.Td>
+                <Table.Td>{b.guestName || '-'}</Table.Td>
+                <Table.Td>{b.guestEmail || '-'}</Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      )}
     </AdminLayout>
   )
 }

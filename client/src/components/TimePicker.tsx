@@ -1,3 +1,5 @@
+import { Select } from '@mantine/core'
+
 interface TimePickerProps {
   value: string | null
   onChange: (time: string | null) => void
@@ -26,25 +28,16 @@ export default function TimePicker({
   step = 15,
 }: TimePickerProps) {
   const times = generateTimes(workStart, workEnd, step)
+  const data = times.map((t) => ({ value: t, label: t }))
 
   return (
-    <select
-      value={value || ''}
-      onChange={(e) => onChange(e.target.value || null)}
-      style={{
-        padding: '8px 12px',
-        borderRadius: 4,
-        border: '1px solid #ccc',
-        fontSize: 14,
-        minWidth: 120,
-      }}
-    >
-      <option value="">-- No time --</option>
-      {times.map((t) => (
-        <option key={t} value={t}>
-          {t}
-        </option>
-      ))}
-    </select>
+    <Select
+      placeholder="-- No time --"
+      data={data}
+      value={value}
+      onChange={onChange}
+      clearable
+      style={{ minWidth: 120 }}
+    />
   )
 }

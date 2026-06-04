@@ -6,32 +6,14 @@ import { getSlots, createBooking } from '../api/bookings'
 import type { Slot } from '../api/bookings'
 import Layout from '../components/Layout'
 import TimeSlotPicker from '../components/TimeSlotPicker'
-
-function getDateRange(): string[] {
-  const dates: string[] = []
-  const today = new Date()
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(today)
-    d.setDate(d.getDate() + i)
-    dates.push(d.toISOString().slice(0, 10))
-  }
-  return dates
-}
-
-function formatDateLabel(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00')
-  return d.toLocaleDateString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  })
-}
+import { Title, Text, Button, TextInput, Alert, Loader, Stack } from '@mantine/core'
+import { DatePicker } from '@mantine/dates'
 
 export default function BookPage() {
   const { eventTypeId } = useParams<{ eventTypeId: string }>()
   const navigate = useNavigate()
   const [eventType, setEventType] = useState<EventType | null>(null)
-  const [selectedDate, setSelectedDate] = useState('')
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [slots, setSlots] = useState<Slot[]>([])
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [guestName, setGuestName] = useState('')
@@ -40,8 +22,6 @@ export default function BookPage() {
   const [slotsLoading, setSlotsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-
-  const dates = getDateRange()
 
   useEffect(() => {
     getEventTypes()
@@ -61,7 +41,8 @@ export default function BookPage() {
     if (!selectedDate || !eventTypeId) return
     setSlotsLoading(true)
     setSelectedSlot(null)
-    getSlots(parseInt(eventTypeId, 10), selectedDate)
+    const dateStr = selectedDate.toISOString().slice(0, 10)
+    getSlots(parseInt(eventTypeId, 10), dateStr)
       .then(setSlots)
       .catch((e) => setError(e.message))
       .finally(() => setSlotsLoading(false))
@@ -86,7 +67,7 @@ export default function BookPage() {
   if (loading) {
     return (
       <Layout>
-        <p>Loading...</p>
+        <Loader />
       </Layout>
     )
   }
@@ -94,7 +75,7 @@ export default function BookPage() {
   if (error && !eventType) {
     return (
       <Layout>
-        <p style={{ color: 'red' }}>{error}</p>
+        <Alert color="red">{error}</Alert>
       </Layout>
     )
   }
@@ -102,45 +83,31 @@ export default function BookPage() {
   if (success) {
     return (
       <Layout>
-        <h2>Booking Confirmed!</h2>
-        <p>
+        <Title order={2}>Booking Confirmed!</Title>
+        <Text>
           Your {eventType?.title} has been booked for{' '}
           {selectedSlot && new Date(selectedSlot.startTime).toLocaleString()}.
-        </p>
-        <button onClick={() => navigate('/')}>Back to Home</button>
+        </Text>
+        <Button onClick={() => navigate('/')} mt="md">Back to Home</Button>
       </Layout>
     )
   }
 
   return (
     <Layout>
-      <h2>Book: {eventType?.title}</h2>
-      {eventType?.description && <p>{eventType.description}</p>}
-      <p>
-        <strong>Duration:</strong> {eventType?.duration} min
-      </p>
+      <Title order={2}>Book: {eventType?.title}</Title>
+      {eventType?.description && <Text>{eventType.description}</Text>}
+      <Text mb="md"><strong>Duration:</strong> {eventType?.duration} min</Text>
 
-      <h3>Select a date</h3>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-        {dates.map((date) => (
-          <button
-            key={date}
-            onClick={() => setSelectedDate(date)}
-            style={{
-              padding: '8px 12px',
-              border: '1px solid #ccc',
-              borderRadius: 6,
-              cursor: 'pointer',
-              backgroundColor: selectedDate === date ? '#0066cc' : '#fff',
-              color: selectedDate === date ? '#fff' : '#333',
-            }}
-          >
-            {formatDateLabel(date)}
-          </button>
-        ))}
-      </div>
+      <Title order={3} mb="sm">Select a date</Title>
+      <DatePicker
+        value={selectedDate}
+        onChange={setSelectedDate}
+        minDate={new Date()}
+        maxDate={new Date(Date.now() + 13 * 24 * 60 * 60 * 1000)}
+      />
 
-      {slotsLoading && <p>Loading slots...</p>}
+      {slotsLoading && <Loader mt="md" />}
 
       {selectedDate && !slotsLoading && (
         <TimeSlotPicker
@@ -151,9 +118,9 @@ export default function BookPage() {
       )}
 
       {selectedSlot && (
-        <div style={{ marginTop: 24, borderTop: '1px solid #ddd', paddingTop: 16 }}>
-          <h3>Complete Booking</h3>
-          <p>
+        <Stack mt="xl" style={{ maxWidth: 400 }}>
+          <Text fw={500}>Complete Booking</Text>
+          <Text>
             Time:{' '}
             {new Date(selectedSlot.startTime).toLocaleTimeString([], {
               hour: '2-digit',
@@ -164,36 +131,20 @@ export default function BookPage() {
               hour: '2-digit',
               minute: '2-digit',
             })}
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 300 }}>
-            <input
-              placeholder="Your name (optional)"
-              value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
-              style={{ padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
-            />
-            <input
-              placeholder="Your email (optional)"
-              value={guestEmail}
-              onChange={(e) => setGuestEmail(e.target.value)}
-              style={{ padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
-            />
-            <button
-              onClick={handleBook}
-              style={{
-                padding: 10,
-                backgroundColor: '#0066cc',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                cursor: 'pointer',
-              }}
-            >
-              Confirm Booking
-            </button>
-          </div>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-        </div>
+          </Text>
+          <TextInput
+            placeholder="Your name (optional)"
+            value={guestName}
+            onChange={(e) => setGuestName(e.target.value)}
+          />
+          <TextInput
+            placeholder="Your email (optional)"
+            value={guestEmail}
+            onChange={(e) => setGuestEmail(e.target.value)}
+          />
+          <Button onClick={handleBook}>Confirm Booking</Button>
+          {error && <Alert color="red">{error}</Alert>}
+        </Stack>
       )}
     </Layout>
   )

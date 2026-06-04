@@ -1,20 +1,11 @@
 import { Link } from 'react-router-dom'
+import { Card, Group, Text, Badge, Button, Title } from '@mantine/core'
 import type { EventType } from '../api/eventTypes'
-
-const cardStyle: React.CSSProperties = {
-  border: '1px solid #ddd',
-  borderRadius: 8,
-  padding: 20,
-  marginBottom: 16,
-}
 
 function formatDateLabel(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00')
   return d.toLocaleDateString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
   })
 }
 
@@ -30,41 +21,30 @@ export default function EventTypeCard({
   const isScheduled = eventType.date && eventType.startTime
 
   return (
-    <div style={cardStyle}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <h3 style={{ margin: 0 }}>{eventType.title}</h3>
+    <Card shadow="sm" padding="lg" mb="md" withBorder>
+      <Group gap="xs" mb="xs">
+        <Title order={3}>{eventType.title}</Title>
         {isScheduled && (
-          <span
-            style={{
-              fontSize: 12,
-              backgroundColor: '#e8f4fd',
-              color: '#0066cc',
-              padding: '2px 8px',
-              borderRadius: 4,
-              border: '1px solid #b8dfff',
-            }}
-          >
-            📅 {formatDateLabel(eventType.date!)} at {eventType.startTime}
-          </span>
+          <Badge color="blue" variant="light">
+            {formatDateLabel(eventType.date!)} at {eventType.startTime}
+          </Badge>
         )}
-      </div>
+      </Group>
       {eventType.description && (
-        <p style={{ color: '#555' }}>{eventType.description}</p>
+        <Text c="dimmed" mb="xs">{eventType.description}</Text>
       )}
-      <p>
+      <Text mb="md">
         <strong>Duration:</strong> {eventType.duration} min
         {isScheduled && ' (single slot)'}
-      </p>
+      </Text>
       {admin ? (
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Link to={`/admin/event-types/${eventType.id}/edit`}>Edit</Link>
-          <button onClick={() => onDelete?.(eventType.id)}>Delete</button>
-        </div>
+        <Group gap="xs">
+          <Button component={Link} to={`/admin/event-types/${eventType.id}/edit`} variant="light" size="xs">Edit</Button>
+          <Button onClick={() => onDelete?.(eventType.id)} color="red" variant="light" size="xs">Delete</Button>
+        </Group>
       ) : (
-        <Link to={`/book/${eventType.id}`}>
-          <button>Book</button>
-        </Link>
+        <Button component={Link} to={`/book/${eventType.id}`} size="sm">Book</Button>
       )}
-    </div>
+    </Card>
   )
 }
