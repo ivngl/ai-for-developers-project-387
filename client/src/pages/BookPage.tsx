@@ -41,7 +41,7 @@ export default function BookPage() {
     if (!selectedDate || !eventTypeId) return
     setSlotsLoading(true)
     setSelectedSlot(null)
-    const dateStr = selectedDate.toISOString().slice(0, 10)
+    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
     getSlots(parseInt(eventTypeId, 10), dateStr)
       .then(setSlots)
       .catch((e) => setError(e.message))

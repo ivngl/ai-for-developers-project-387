@@ -3,6 +3,7 @@ import { defineConfig } from '@playwright/test'
 export default defineConfig({
   testDir: './',
   globalSetup: './global-setup',
+  workers: 1,
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
@@ -12,7 +13,7 @@ export default defineConfig({
       command: 'npx tsx src/index.ts',
       port: 3001,
       cwd: './server',
-      env: { DATABASE_URL: 'file:./test.db' },
+      env: { DATABASE_URL: 'file:./dev.db' },
       reuseExistingServer: !process.env.CI,
     },
     {

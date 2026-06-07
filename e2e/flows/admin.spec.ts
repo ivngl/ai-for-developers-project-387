@@ -59,7 +59,7 @@ test('admin can edit an existing event type', async ({ page }) => {
   await page.getByRole('button', { name: 'Login' }).click()
   await expect(page).toHaveURL('/admin')
 
-  await page.getByRole('button', { name: 'Edit' }).first().click()
+  await page.getByRole('link', { name: 'Edit' }).first().click()
   await expect(page).toHaveURL(/\/admin\/event-types\/\d+\/edit/)
 
   const titleInput = page.getByLabel('Title *')

@@ -24,18 +24,12 @@ test.beforeEach(async ({ request }) => {
 async function selectDayInFuture(page: import('@playwright/test').Page, daysAhead: number) {
   const future = new Date()
   future.setDate(future.getDate() + daysAhead)
-  const dayNum = String(future.getDate())
-  await page.evaluate((day) => {
-    const buttons = document.querySelectorAll<HTMLButtonElement>(
-      'table[role="grid"] button',
-    )
-    for (const btn of buttons) {
-      if (btn.textContent?.trim() === day) {
-        btn.click()
-        return
-      }
-    }
-  }, dayNum)
+  const dayLabel = future.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+  await page.getByRole('button', { name: dayLabel, exact: true }).click()
 }
 
 test('user can book a meeting end-to-end', async ({ page }) => {
@@ -46,18 +40,13 @@ test('user can book a meeting end-to-end', async ({ page }) => {
   await expect(page).toHaveURL(/\/book\/\d+/)
   await expect(page.getByText('Duration: 30 min')).toBeVisible()
 
-  // Select a date 2 days in the future to avoid timezone edge cases
+  const slotsPromise = page.waitForResponse(
+    (resp) => resp.url().includes('/api/slots') && resp.status() === 200,
+  )
   await selectDayInFuture(page, 2)
+  await slotsPromise
 
-  await page.waitForResponse(async (resp) => {
-    if (resp.url().includes('/api/slots') && resp.status() === 200) {
-      const body = await resp.json()
-      return body.length > 0 && body.some((s: { available: boolean }) => s.available)
-    }
-    return false
-  })
-
-  await page.getByRole('button', { name: /^\d{2}:\d{2}$/ }).first().click()
+  await page.locator('button:has-text(":")').first().click()
 
   await page.getByPlaceholder('Your name (optional)').fill('Test User')
   await page.getByPlaceholder('Your email (optional)').fill('test@example.com')
@@ -82,17 +71,13 @@ test('user can go back to home after booking', async ({ page }) => {
   await page.getByRole('link', { name: 'Book' }).first().click()
   await expect(page).toHaveURL(/\/book\/\d+/)
 
+  const slotsPromise2 = page.waitForResponse(
+    (resp) => resp.url().includes('/api/slots') && resp.status() === 200,
+  )
   await selectDayInFuture(page, 2)
+  await slotsPromise2
 
-  await page.waitForResponse(async (resp) => {
-    if (resp.url().includes('/api/slots') && resp.status() === 200) {
-      const body = await resp.json()
-      return body.length > 0 && body.some((s: { available: boolean }) => s.available)
-    }
-    return false
-  })
-
-  await page.getByRole('button', { name: /^\d{2}:\d{2}$/ }).first().click()
+  await page.locator('button:has-text(":")').first().click()
 
   await page.getByPlaceholder('Your name (optional)').fill('Alice')
   await page.getByRole('button', { name: 'Confirm Booking' }).click()

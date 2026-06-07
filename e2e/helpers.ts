@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient({
-  datasources: { db: { url: 'file:./test.db' } },
+  datasources: { db: { url: 'file:./dev.db' } },
 })
 
 export function localDateStr(date: Date = new Date()): string {
