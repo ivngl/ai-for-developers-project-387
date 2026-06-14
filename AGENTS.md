@@ -69,3 +69,7 @@ DELETE /api/events/:id
 | `npm run db:generate` | server/ | Generate Prisma client |
 | `npm run db:push` | server/ | Push schema to SQLite |
 | `npm run db:studio` | server/ | Open Prisma Studio |
+
+## User Scenarios for Testing
+
+Подробный план тестирования со сценариями, шагами и маппингом на e2e-тесты см. в [`TEST_PLAN.md`](./TEST_PLAN.md).

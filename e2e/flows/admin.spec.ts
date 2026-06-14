@@ -99,3 +99,121 @@ test('admin with wrong password sees error', async ({ page }) => {
   await expect(page.getByText('Invalid password')).toBeVisible()
   await expect(page).toHaveURL('/admin/login')
 })
+
+test('admin can create a single-slot event type', async ({ page }) => {
+  await page.goto('/admin/login')
+  await page.getByPlaceholder('Enter admin password').fill('admin123')
+  await page.getByRole('button', { name: 'Login' }).click()
+  await expect(page).toHaveURL('/admin')
+
+  await page.getByRole('link', { name: 'New Event Type' }).click()
+  await expect(page).toHaveURL('/admin/event-types/new')
+
+  await page.getByLabel('Title *').fill('Single Slot Meeting')
+  await page.getByLabel('Description').fill('One-time event')
+  await page.getByLabel('Duration (minutes) *').fill('30')
+
+  const future = new Date()
+  future.setDate(future.getDate() + 5)
+  const dayLabel = future.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+  await page.getByRole('button', { name: dayLabel, exact: true }).click()
+
+  await page.getByRole('button', { name: 'Save' }).click()
+
+  await expect(page).toHaveURL('/admin')
+  await expect(page.getByText('Single Slot Meeting').first()).toBeVisible()
+  await expect(page.getByText('(single slot)')).toBeVisible()
+})
+
+test('admin can see empty bookings state', async ({ page }) => {
+  await page.goto('/admin/login')
+  await page.getByPlaceholder('Enter admin password').fill('admin123')
+  await page.getByRole('button', { name: 'Login' }).click()
+  await expect(page).toHaveURL('/admin')
+
+  await expect(page.getByText('No bookings yet.')).toBeVisible()
+})
+
+test('admin can see bookings with data', async ({ page, request }) => {
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+
+  const today = new Date()
+  const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+
+  const startTime = new Date(`${dateStr}T10:00:00.000Z`).toISOString()
+  const endTime = new Date(`${dateStr}T11:00:00.000Z`).toISOString()
+
+  await request.post(`${API}/api/bookings`, {
+    data: {
+      eventTypeId: 1,
+      startTime,
+      endTime,
+      guestName: 'Charlie',
+      guestEmail: 'charlie@example.com',
+    },
+  })
+
+  await page.goto('/admin/login')
+  await page.getByPlaceholder('Enter admin password').fill('admin123')
+  await page.getByRole('button', { name: 'Login' }).click()
+  await expect(page).toHaveURL('/admin')
+
+  await expect(page.getByText('charlie@example.com')).toBeVisible()
+  await expect(page.getByText('Charlie')).toBeVisible()
+  await expect(page.getByText('Existing Meeting')).toBeVisible()
+})
+
+test('admin can log out', async ({ page }) => {
+  await page.goto('/admin/login')
+  await page.getByPlaceholder('Enter admin password').fill('admin123')
+  await page.getByRole('button', { name: 'Login' }).click()
+  await expect(page).toHaveURL('/admin')
+
+  await page.getByRole('button', { name: 'Logout' }).click()
+  await expect(page).toHaveURL('/admin/login')
+
+  await page.goto('/admin')
+  await expect(page.getByText('Admin Login')).toBeVisible()
+})
+
+test('admin sees error when deleting event type with bookings', async ({
+  page,
+  request,
+}) => {
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+
+  const today = new Date()
+  const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+
+  const startTime = new Date(`${dateStr}T10:00:00.000Z`).toISOString()
+  const endTime = new Date(`${dateStr}T11:00:00.000Z`).toISOString()
+
+  await request.post(`${API}/api/bookings`, {
+    data: {
+      eventTypeId: 1,
+      startTime,
+      endTime,
+      guestName: 'Dave',
+    },
+  })
+
+  await page.goto('/admin/login')
+  await page.getByPlaceholder('Enter admin password').fill('admin123')
+  await page.getByRole('button', { name: 'Login' }).click()
+  await expect(page).toHaveURL('/admin')
+
+  page.on('dialog', (dialog) => dialog.accept())
+  await page.getByRole('button', { name: 'Delete' }).first().click()
+
+  await expect(page.getByText('Existing Meeting')).toBeVisible()
+})

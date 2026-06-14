@@ -65,6 +65,33 @@ test('user can book a meeting end-to-end', async ({ page }) => {
   expect(booking!.eventType.title).toBe('Quick Chat')
 })
 
+test('user can book without providing name or email', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByText('Quick Chat')).toBeVisible()
+
+  await page.getByRole('link', { name: 'Book' }).first().click()
+  await expect(page).toHaveURL(/\/book\/\d+/)
+
+  const slotsPromise = page.waitForResponse(
+    (resp) => resp.url().includes('/api/slots') && resp.status() === 200,
+  )
+  await selectDayInFuture(page, 3)
+  await slotsPromise
+
+  await page.locator('button:has-text(":")').first().click()
+
+  await page.getByRole('button', { name: 'Confirm Booking' }).click()
+
+  await expect(page.getByText('Booking Confirmed!')).toBeVisible()
+
+  const booking = await prisma.booking.findFirst({
+    orderBy: { createdAt: 'desc' },
+  })
+  expect(booking).not.toBeNull()
+  expect(booking!.guestName).toBeNull()
+  expect(booking!.guestEmail).toBeNull()
+})
+
 test('user can go back to home after booking', async ({ page }) => {
   await page.goto('/')
 

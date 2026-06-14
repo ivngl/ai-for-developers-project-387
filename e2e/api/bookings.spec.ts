@@ -177,3 +177,37 @@ test('GET /api/bookings with auth returns bookings list', async ({ request }) =>
   expect(body[0].eventType).toBeDefined()
   expect(body[0].eventType.title).toBe('Test')
 })
+
+test('POST /api/bookings without guestName and guestEmail creates booking with nulls', async ({
+  request,
+}) => {
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+
+  const et = await request.post(`${API}/api/event-types`, {
+    data: { title: 'No Contact', duration: 30 },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const eventType = await et.json()
+
+  const startTime = new Date(`${dateStr}T10:00:00.000Z`).toISOString()
+  const endTime = new Date(`${dateStr}T10:30:00.000Z`).toISOString()
+
+  const res = await request.post(`${API}/api/bookings`, {
+    data: { eventTypeId: eventType.id, startTime, endTime },
+  })
+  expect(res.status()).toBe(201)
+  const body = await res.json()
+  expect(body.guestName).toBeNull()
+  expect(body.guestEmail).toBeNull()
+})
+
+test('GET /api/bookings with invalid JWT returns 401', async ({ request }) => {
+  const res = await request.get(`${API}/api/bookings`, {
+    headers: { Authorization: 'Bearer invalid-token' },
+  })
+  expect(res.status()).toBe(401)
+  expect(await res.json()).toEqual({ error: 'Invalid or expired token' })
+})

@@ -117,6 +117,32 @@ test('PUT /api/event-types/:id updates event type', async ({ request }) => {
   expect(updated.duration).toBe(60)
 })
 
+test('PUT /api/event-types/:id with only title leaves other fields unchanged', async ({
+  request,
+}) => {
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+
+  const create = await request.post(`${API}/api/event-types`, {
+    data: { title: 'Original', description: 'Keep me', duration: 30 },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const created = await create.json()
+
+  const update = await request.put(`${API}/api/event-types/${created.id}`, {
+    data: { title: 'Updated Title' },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  expect(update.ok()).toBeTruthy()
+  const updated = await update.json()
+
+  expect(updated.title).toBe('Updated Title')
+  expect(updated.description).toBe('Keep me')
+  expect(updated.duration).toBe(30)
+})
+
 test('PUT /api/event-types/:id without auth returns 401', async ({ request }) => {
   const login = await request.post(`${API}/api/admin/login`, {
     data: { password: 'admin123' },
