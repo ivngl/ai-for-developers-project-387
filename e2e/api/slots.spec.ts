@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { cleanDb, localDateStr } from '../helpers'
 
-const API = 'http://127.0.0.1:3001'
+const API = 'http://localhost:3001'
 const dateStr = localDateStr()
 const tomorrowStr = localDateStr(new Date(Date.now() + 86400000))
 

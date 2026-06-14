@@ -42,7 +42,7 @@ jobs:
 
       - name: Start client
         run: |
-          cd client && npx vite &
+          cd client && npx vite --host &
           sleep 2
           curl --retry 5 --retry-delay 2 --retry-connrefused -o /dev/null -w "%{http_code}" http://localhost:5173
 

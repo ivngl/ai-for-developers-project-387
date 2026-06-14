@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { cleanDb, prisma, localDateStr } from '../helpers'
 
-const API = 'http://127.0.0.1:3001'
+const API = 'http://localhost:3001'
 
 test.beforeEach(async ({ request }) => {
   await cleanDb()

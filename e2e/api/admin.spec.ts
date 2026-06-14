@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test('POST /api/admin/login with correct password returns token', async ({ request }) => {
-  const res = await request.post('http://127.0.0.1:3001/api/admin/login', {
+  const res = await request.post('http://localhost:3001/api/admin/login', {
     data: { password: 'admin123' },
   })
   expect(res.ok()).toBeTruthy()
@@ -11,7 +11,7 @@ test('POST /api/admin/login with correct password returns token', async ({ reque
 })
 
 test('POST /api/admin/login with wrong password returns 401', async ({ request }) => {
-  const res = await request.post('http://127.0.0.1:3001/api/admin/login', {
+  const res = await request.post('http://localhost:3001/api/admin/login', {
     data: { password: 'wrong-password' },
   })
   expect(res.status()).toBe(401)
@@ -19,7 +19,7 @@ test('POST /api/admin/login with wrong password returns 401', async ({ request }
 })
 
 test('POST /api/admin/login with empty body returns 401', async ({ request }) => {
-  const res = await request.post('http://127.0.0.1:3001/api/admin/login', {
+  const res = await request.post('http://localhost:3001/api/admin/login', {
     data: {},
   })
   expect(res.status()).toBe(401)
