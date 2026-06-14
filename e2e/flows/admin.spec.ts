@@ -222,5 +222,5 @@ test('admin sees error when deleting event type with bookings', async ({
   page.on('dialog', (dialog) => dialog.accept())
   await page.getByRole('button', { name: 'Delete' }).first().click()
 
-  await expect(page.getByText('Existing Meeting').first()).toBeVisible()
+  await expect(page.getByText('Cannot delete event type with existing bookings')).toBeVisible()
 })
