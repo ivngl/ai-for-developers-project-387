@@ -1,0 +1,45 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run db:generate -w server
+        env:
+          DATABASE_URL: file:./dev.db
+
+      - name: Install Playwright chromium
+        run: npx playwright install chromium
+
+      - name: Run e2e tests
+        run: npm run test:e2e
+        env:
+          DATABASE_URL: file:./dev.db
+          ADMIN_PASSWORD: admin123
+          JWT_SECRET: test-secret-key
+          WORK_HOURS_START: 9
+          WORK_HOURS_END: 18
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 3
