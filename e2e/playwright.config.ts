@@ -5,22 +5,7 @@ export default defineConfig({
   globalSetup: './global-setup',
   workers: 1,
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://127.0.0.1:5173',
     trace: 'on-first-retry',
   },
-  webServer: [
-    {
-      command: 'npx tsx src/index.ts',
-      port: 3001,
-      cwd: './server',
-      env: { DATABASE_URL: 'file:./dev.db' },
-      reuseExistingServer: !process.env.CI,
-    },
-    {
-      command: 'npx vite',
-      port: 5173,
-      cwd: './client',
-      reuseExistingServer: !process.env.CI,
-    },
-  ],
 })

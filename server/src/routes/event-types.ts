@@ -109,7 +109,11 @@ router.delete('/:id', adminAuth, async (req: Request, res: Response) => {
     return res.status(404).json({ error: 'Event type not found' })
   }
 
-  await prisma.eventType.delete({ where: { id } })
+  try {
+    await prisma.eventType.delete({ where: { id } })
+  } catch {
+    return res.status(409).json({ error: 'Cannot delete event type with existing bookings' })
+  }
   return res.json({ status: 'ok' })
 })
 

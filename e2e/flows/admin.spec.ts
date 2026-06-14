@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { cleanDb, prisma } from '../helpers'
 
-const API = 'http://localhost:3001'
+const API = 'http://127.0.0.1:3001'
+
+let seededEventTypeId: number
 
 test.beforeEach(async ({ request }) => {
   await cleanDb()
@@ -11,7 +13,7 @@ test.beforeEach(async ({ request }) => {
   })
   const { token } = await login.json()
 
-  await request.post(`${API}/api/event-types`, {
+  const res = await request.post(`${API}/api/event-types`, {
     data: {
       title: 'Existing Meeting',
       description: 'Pre-seeded event',
@@ -19,6 +21,8 @@ test.beforeEach(async ({ request }) => {
     },
     headers: { Authorization: `Bearer ${token}` },
   })
+  const eventType = await res.json()
+  seededEventTypeId = eventType.id
 })
 
 test('admin can log in and see the dashboard', async ({ page }) => {
@@ -122,6 +126,9 @@ test('admin can create a single-slot event type', async ({ page }) => {
   })
   await page.getByRole('button', { name: dayLabel, exact: true }).click()
 
+  await page.getByPlaceholder('-- No time --').click()
+  await page.getByRole('option', { name: '10:00' }).click()
+
   await page.getByRole('button', { name: 'Save' }).click()
 
   await expect(page).toHaveURL('/admin')
@@ -152,7 +159,7 @@ test('admin can see bookings with data', async ({ page, request }) => {
 
   await request.post(`${API}/api/bookings`, {
     data: {
-      eventTypeId: 1,
+      eventTypeId: seededEventTypeId,
       startTime,
       endTime,
       guestName: 'Charlie',
@@ -166,8 +173,8 @@ test('admin can see bookings with data', async ({ page, request }) => {
   await expect(page).toHaveURL('/admin')
 
   await expect(page.getByText('charlie@example.com')).toBeVisible()
-  await expect(page.getByText('Charlie')).toBeVisible()
-  await expect(page.getByText('Existing Meeting')).toBeVisible()
+  await expect(page.getByText('Charlie').first()).toBeVisible()
+  await expect(page.getByText('Existing Meeting').first()).toBeVisible()
 })
 
 test('admin can log out', async ({ page }) => {
@@ -200,7 +207,7 @@ test('admin sees error when deleting event type with bookings', async ({
 
   await request.post(`${API}/api/bookings`, {
     data: {
-      eventTypeId: 1,
+      eventTypeId: seededEventTypeId,
       startTime,
       endTime,
       guestName: 'Dave',
@@ -215,5 +222,5 @@ test('admin sees error when deleting event type with bookings', async ({
   page.on('dialog', (dialog) => dialog.accept())
   await page.getByRole('button', { name: 'Delete' }).first().click()
 
-  await expect(page.getByText('Existing Meeting')).toBeVisible()
+  await expect(page.getByText('Existing Meeting').first()).toBeVisible()
 })

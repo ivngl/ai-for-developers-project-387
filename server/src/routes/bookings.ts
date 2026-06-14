@@ -2,6 +2,10 @@ import { Router, Request, Response } from 'express'
 import prisma from '../lib/prisma.js'
 import { adminAuth } from '../middleware/adminAuth.js'
 
+class ConflictError extends Error {
+  statusCode = 409
+}
+
 const router = Router()
 
 router.post('/', async (req: Request, res: Response) => {
@@ -37,26 +41,35 @@ router.post('/', async (req: Request, res: Response) => {
     })
   }
 
-  const conflicting = await prisma.booking.findFirst({
-    where: {
-      startTime: { lt: end },
-      endTime: { gt: start },
-    },
-  })
-  if (conflicting) {
-    return res.status(409).json({ error: 'This time slot is already booked' })
-  }
+  try {
+    const booking = await prisma.$transaction(async (tx) => {
+      const conflicting = await tx.booking.findFirst({
+        where: {
+          startTime: { lt: end },
+          endTime: { gt: start },
+        },
+      })
+      if (conflicting) {
+        throw new ConflictError('This time slot is already booked')
+      }
 
-  const booking = await prisma.booking.create({
-    data: {
-      eventTypeId,
-      startTime: start,
-      endTime: end,
-      guestName: guestName?.trim() || null,
-      guestEmail: guestEmail?.trim() || null,
-    },
-  })
-  return res.status(201).json(booking)
+      return tx.booking.create({
+        data: {
+          eventTypeId,
+          startTime: start,
+          endTime: end,
+          guestName: guestName?.trim() || null,
+          guestEmail: guestEmail?.trim() || null,
+        },
+      })
+    })
+    return res.status(201).json(booking)
+  } catch (err) {
+    if (err instanceof ConflictError) {
+      return res.status(409).json({ error: err.message })
+    }
+    throw err
+  }
 })
 
 router.get('/', adminAuth, async (_req: Request, res: Response) => {

@@ -28,6 +28,24 @@ jobs:
       - name: Install Playwright chromium
         run: npx playwright install chromium
 
+      - name: Start server
+        run: |
+          cd server && npx tsx src/index.ts &
+          sleep 3
+          curl --retry 5 --retry-delay 2 --retry-connrefused http://localhost:3001/api/health
+        env:
+          DATABASE_URL: file:./dev.db
+          ADMIN_PASSWORD: admin123
+          JWT_SECRET: test-secret-key
+          WORK_HOURS_START: 9
+          WORK_HOURS_END: 18
+
+      - name: Start client
+        run: |
+          cd client && npx vite &
+          sleep 2
+          curl --retry 5 --retry-delay 2 --retry-connrefused -o /dev/null -w "%{http_code}" http://localhost:5173
+
       - name: Run e2e tests
         run: npm run test:e2e
         env:
@@ -36,6 +54,10 @@ jobs:
           JWT_SECRET: test-secret-key
           WORK_HOURS_START: 9
           WORK_HOURS_END: 18
+
+      - name: Cleanup
+        if: always()
+        run: kill $(lsof -t -i:3001) $(lsof -t -i:5173) 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
         if: failure()
