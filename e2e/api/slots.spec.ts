@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test'
-import { cleanDb, localDateStr } from '../helpers'
+import { cleanDb, localDateStr, futureDateStr } from '../helpers'
 
 const API = 'http://localhost:3001'
-const dateStr = localDateStr()
-const tomorrowStr = localDateStr(new Date(Date.now() + 86400000))
+const dateStr = futureDateStr(2)
+const tomorrowStr = futureDateStr(3)
 
 async function createEventType(
   request: import('@playwright/test').APIRequestContext,
@@ -22,8 +22,8 @@ async function createEventType(
   return res.json()
 }
 
-test.beforeEach(async () => {
-  await cleanDb()
+test.beforeEach(async ({ request }) => {
+  await cleanDb(request)
 })
 
 test('GET /api/slots without eventTypeId returns 400', async ({ request }) => {

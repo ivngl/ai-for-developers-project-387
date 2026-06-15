@@ -3,8 +3,8 @@ import { cleanDb } from '../helpers'
 
 const API = 'http://localhost:3001'
 
-test.beforeEach(async () => {
-  await cleanDb()
+test.beforeEach(async ({ request }) => {
+  await cleanDb(request)
 })
 
 test('GET /api/event-types returns empty array initially', async ({ request }) => {
@@ -247,4 +247,51 @@ test('GET /api/event-types returns created event types', async ({ request }) => 
   expect(types).toHaveLength(2)
   expect(types.map((t: { title: string }) => t.title)).toContain('Meeting A')
   expect(types.map((t: { title: string }) => t.title)).toContain('Meeting B')
+})
+
+test('POST /api/event-types with past date returns 400', async ({ request }) => {
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+
+  const res = await request.post(`${API}/api/event-types`, {
+    data: { title: 'Past', duration: 30, date: '2020-01-01', startTime: '10:00' },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  expect(res.status()).toBe(400)
+  expect(await res.json()).toEqual({ error: 'Date cannot be in the past' })
+})
+
+test('POST /api/event-types with past date+time returns 400', async ({ request }) => {
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+
+  const res = await request.post(`${API}/api/event-types`, {
+    data: { title: 'Past Time', duration: 30, date: '2020-01-01', startTime: '01:00' },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  expect(res.status()).toBe(400)
+})
+
+test('PUT /api/event-types/:id updating to past date returns 400', async ({ request }) => {
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+
+  const create = await request.post(`${API}/api/event-types`, {
+    data: { title: 'Changeable', duration: 30 },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const created = await create.json()
+
+  const res = await request.put(`${API}/api/event-types/${created.id}`, {
+    data: { date: '2020-01-01', startTime: '10:00' },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  expect(res.status()).toBe(400)
+  expect(await res.json()).toEqual({ error: 'Date cannot be in the past' })
 })

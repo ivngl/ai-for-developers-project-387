@@ -48,6 +48,7 @@ router.get('/', async (req: Request, res: Response) => {
 
   const existingBookings = await prisma.booking.findMany({
     where: {
+      eventTypeId,
       startTime: { gte: dayStart, lt: dayEnd },
     },
     orderBy: { startTime: 'asc' },

@@ -5,7 +5,7 @@ export default defineConfig({
   globalSetup: './global-setup',
   workers: 1,
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',
   },
 })

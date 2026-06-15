@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test'
-import { cleanDb, localDateStr } from '../helpers'
+import { cleanDb, futureDateStr } from '../helpers'
 
 const API = 'http://localhost:3001'
-const dateStr = localDateStr()
+const dateStr = futureDateStr(2)
 
-test.beforeEach(async () => {
-  await cleanDb()
+test.beforeEach(async ({ request }) => {
+  await cleanDb(request)
 })
 
 test('concurrent booking requests — one succeeds, one gets 409', async ({

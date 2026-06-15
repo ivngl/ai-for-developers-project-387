@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { cleanDb, prisma, localDateStr } from '../helpers'
+import { cleanDb, localDateStr } from '../helpers'
 
 const API = 'http://localhost:3001'
 
 test.beforeEach(async ({ request }) => {
-  await cleanDb()
+  await cleanDb(request)
 
   const login = await request.post(`${API}/api/admin/login`, {
     data: { password: 'admin123' },
@@ -32,7 +32,7 @@ async function selectDayInFuture(page: import('@playwright/test').Page, daysAhea
   await page.getByRole('button', { name: dayLabel, exact: true }).click()
 }
 
-test('user can book a meeting end-to-end', async ({ page }) => {
+test('user can book a meeting end-to-end', async ({ page, request }) => {
   await page.goto('/')
   await expect(page.getByText('Quick Chat')).toBeVisible()
 
@@ -56,16 +56,21 @@ test('user can book a meeting end-to-end', async ({ page }) => {
   await expect(page.getByText('Booking Confirmed!')).toBeVisible()
   await expect(page.getByText(/has been booked/)).toBeVisible()
 
-  const booking = await prisma.booking.findFirst({
-    where: { guestEmail: 'test@example.com' },
-    include: { eventType: true },
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
   })
-  expect(booking).not.toBeNull()
-  expect(booking!.guestName).toBe('Test User')
-  expect(booking!.eventType.title).toBe('Quick Chat')
+  const { token } = await login.json()
+  const bookingsRes = await request.get(`${API}/api/bookings`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const bookings = await bookingsRes.json()
+  const booking = bookings.find((b: { guestEmail: string }) => b.guestEmail === 'test@example.com')
+  expect(booking).not.toBeUndefined()
+  expect(booking.guestName).toBe('Test User')
+  expect(booking.eventType.title).toBe('Quick Chat')
 })
 
-test('user can book without providing name or email', async ({ page }) => {
+test('user can book without providing name or email', async ({ page, request }) => {
   await page.goto('/')
   await expect(page.getByText('Quick Chat')).toBeVisible()
 
@@ -84,12 +89,18 @@ test('user can book without providing name or email', async ({ page }) => {
 
   await expect(page.getByText('Booking Confirmed!')).toBeVisible()
 
-  const booking = await prisma.booking.findFirst({
-    orderBy: { createdAt: 'desc' },
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
   })
-  expect(booking).not.toBeNull()
-  expect(booking!.guestName).toBeNull()
-  expect(booking!.guestEmail).toBeNull()
+  const { token } = await login.json()
+  const bookingsRes = await request.get(`${API}/api/bookings`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const bookings = await bookingsRes.json()
+  const booking = bookings[bookings.length - 1]
+  expect(booking).toBeDefined()
+  expect(booking.guestName).toBeNull()
+  expect(booking.guestEmail).toBeNull()
 })
 
 test('user can go back to home after booking', async ({ page }) => {

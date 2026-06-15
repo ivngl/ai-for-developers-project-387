@@ -48,6 +48,7 @@ router.post('/', async (req: Request, res: Response) => {
     const booking = await prisma.$transaction(async (tx) => {
       const conflicting = await tx.booking.findFirst({
         where: {
+          eventTypeId,
           startTime: { lt: end },
           endTime: { gt: start },
         },

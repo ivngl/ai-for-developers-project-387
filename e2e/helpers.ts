@@ -1,8 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient({
-  datasources: { db: { url: 'file:./dev.db' } },
-})
+import type { APIRequestContext } from '@playwright/test'
 
 export function localDateStr(date: Date = new Date()): string {
   const y = date.getFullYear()
@@ -11,13 +7,18 @@ export function localDateStr(date: Date = new Date()): string {
   return `${y}-${m}-${d}`
 }
 
-export async function cleanDb() {
-  await prisma.booking.deleteMany()
-  await prisma.eventType.deleteMany()
+export function futureDateStr(daysFromNow: number = 2): string {
+  const d = new Date()
+  d.setDate(d.getDate() + daysFromNow)
+  return localDateStr(d)
 }
 
-export async function disconnectDb() {
-  await prisma.$disconnect()
+export async function cleanDb(request: APIRequestContext) {
+  const login = await request.post('http://localhost:3001/api/admin/login', {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+  await request.delete('http://localhost:3001/api/admin/reset', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
 }
-
-export { prisma }

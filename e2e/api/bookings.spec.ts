@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test'
-import { cleanDb, localDateStr } from '../helpers'
+import { cleanDb, futureDateStr } from '../helpers'
 
 const API = 'http://localhost:3001'
-const dateStr = localDateStr()
+const dateStr = futureDateStr(2)
 
-test.beforeEach(async () => {
-  await cleanDb()
+test.beforeEach(async ({ request }) => {
+  await cleanDb(request)
 })
 
 test('POST /api/bookings creates a booking', async ({ request }) => {
@@ -54,8 +54,8 @@ test('POST /api/bookings with non-existent event type returns 404', async ({
   const res = await request.post(`${API}/api/bookings`, {
     data: {
       eventTypeId: 99999,
-      startTime: '2026-06-10T10:00:00Z',
-      endTime: '2026-06-10T11:00:00Z',
+      startTime: new Date(`${dateStr}T10:00:00.000Z`).toISOString(),
+      endTime: new Date(`${dateStr}T11:00:00.000Z`).toISOString(),
     },
   })
   expect(res.status()).toBe(404)
@@ -210,4 +210,26 @@ test('GET /api/bookings with invalid JWT returns 401', async ({ request }) => {
   })
   expect(res.status()).toBe(401)
   expect(await res.json()).toEqual({ error: 'Invalid or expired token' })
+})
+
+test('POST /api/bookings with past startTime returns 400', async ({ request }) => {
+  const login = await request.post(`${API}/api/admin/login`, {
+    data: { password: 'admin123' },
+  })
+  const { token } = await login.json()
+
+  const et = await request.post(`${API}/api/event-types`, {
+    data: { title: 'Past Test', duration: 30 },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const eventType = await et.json()
+
+  const pastStart = new Date('2020-01-01T10:00:00.000Z').toISOString()
+  const pastEnd = new Date('2020-01-01T10:30:00.000Z').toISOString()
+
+  const res = await request.post(`${API}/api/bookings`, {
+    data: { eventTypeId: eventType.id, startTime: pastStart, endTime: pastEnd },
+  })
+  expect(res.status()).toBe(400)
+  expect(await res.json()).toEqual({ error: 'Cannot book a time in the past' })
 })

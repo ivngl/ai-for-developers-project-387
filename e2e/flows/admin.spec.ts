@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test'
-import { cleanDb, prisma } from '../helpers'
+import { cleanDb } from '../helpers'
 
 const API = 'http://localhost:3001'
 
 let seededEventTypeId: number
 
 test.beforeEach(async ({ request }) => {
-  await cleanDb()
+  await cleanDb(request)
 
   const login = await request.post(`${API}/api/admin/login`, {
     data: { password: 'admin123' },
@@ -57,7 +57,7 @@ test('admin can create a new event type', async ({ page }) => {
   await expect(page.getByText('Created during test')).toBeVisible()
 })
 
-test('admin can edit an existing event type', async ({ page }) => {
+test('admin can edit an existing event type', async ({ page, request }) => {
   await page.goto('/admin/login')
   await page.getByPlaceholder('Enter admin password').fill('admin123')
   await page.getByRole('button', { name: 'Login' }).click()
@@ -74,10 +74,9 @@ test('admin can edit an existing event type', async ({ page }) => {
   await expect(page).toHaveURL('/admin')
   await expect(page.getByText('Edited Meeting').first()).toBeVisible()
 
-  const updated = await prisma.eventType.findFirst({
-    where: { title: 'Edited Meeting' },
-  })
-  expect(updated).not.toBeNull()
+  const list = await request.get(`${API}/api/event-types`)
+  const types = await list.json()
+  expect(types.some((t: { title: string }) => t.title === 'Edited Meeting')).toBe(true)
 })
 
 test('admin can delete an event type', async ({ page }) => {
@@ -151,8 +150,9 @@ test('admin can see bookings with data', async ({ page, request }) => {
   })
   const { token } = await login.json()
 
-  const today = new Date()
-  const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const future = new Date()
+  future.setDate(future.getDate() + 2)
+  const dateStr = `${future.getFullYear()}-${String(future.getMonth() + 1).padStart(2, '0')}-${String(future.getDate()).padStart(2, '0')}`
 
   const startTime = new Date(`${dateStr}T10:00:00.000Z`).toISOString()
   const endTime = new Date(`${dateStr}T11:00:00.000Z`).toISOString()
@@ -199,8 +199,9 @@ test('admin sees error when deleting event type with bookings', async ({
   })
   const { token } = await login.json()
 
-  const today = new Date()
-  const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const future = new Date()
+  future.setDate(future.getDate() + 2)
+  const dateStr = `${future.getFullYear()}-${String(future.getMonth() + 1).padStart(2, '0')}-${String(future.getDate()).padStart(2, '0')}`
 
   const startTime = new Date(`${dateStr}T10:00:00.000Z`).toISOString()
   const endTime = new Date(`${dateStr}T11:00:00.000Z`).toISOString()
