@@ -29,8 +29,21 @@ router.post('/', adminAuth, async (req: Request, res: Response) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       return res.status(400).json({ error: 'date must be in YYYY-MM-DD format' })
     }
-  }
-  if (startTime) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    if (new Date(date + 'T00:00:00.000Z') < today) {
+      return res.status(400).json({ error: 'Date cannot be in the past' })
+    }
+    if (startTime) {
+      if (!/^\d{2}:\d{2}$/.test(startTime)) {
+        return res.status(400).json({ error: 'startTime must be in HH:mm format' })
+      }
+      const [h, m] = startTime.split(':').map(Number)
+      if (new Date(`${date}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00.000Z`) < new Date()) {
+        return res.status(400).json({ error: 'Event time cannot be in the past' })
+      }
+    }
+  } else if (startTime) {
     if (!/^\d{2}:\d{2}$/.test(startTime)) {
       return res.status(400).json({ error: 'startTime must be in HH:mm format' })
     }
@@ -84,11 +97,24 @@ router.put('/:id', adminAuth, async (req: Request, res: Response) => {
       if (date !== null && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return res.status(400).json({ error: 'date must be in YYYY-MM-DD format or null' })
       }
+      if (date !== null) {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        if (new Date(date + 'T00:00:00.000Z') < today) {
+          return res.status(400).json({ error: 'Date cannot be in the past' })
+        }
+      }
       data.date = date
     }
     if (startTime !== undefined) {
       if (startTime !== null && !/^\d{2}:\d{2}$/.test(startTime)) {
         return res.status(400).json({ error: 'startTime must be in HH:mm format or null' })
+      }
+      if (startTime !== null && date) {
+        const [h, m] = startTime.split(':').map(Number)
+        if (new Date(`${date}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00.000Z`) < new Date()) {
+          return res.status(400).json({ error: 'Event time cannot be in the past' })
+        }
       }
       data.startTime = startTime
     }

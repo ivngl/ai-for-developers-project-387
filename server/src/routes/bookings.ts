@@ -27,6 +27,9 @@ router.post('/', async (req: Request, res: Response) => {
   if (start >= end) {
     return res.status(400).json({ error: 'startTime must be before endTime' })
   }
+  if (start <= new Date()) {
+    return res.status(400).json({ error: 'Cannot book a time in the past' })
+  }
 
   const eventType = await prisma.eventType.findUnique({ where: { id: eventTypeId } })
   if (!eventType) {

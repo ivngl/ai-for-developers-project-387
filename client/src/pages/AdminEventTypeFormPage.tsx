@@ -114,7 +114,7 @@ export default function AdminEventTypeFormPage() {
             Leave empty to make it a recurring template available on any day.
           </Text>
           <Group gap="lg" mt="sm" align="flex-start">
-            <DatePicker value={date} onChange={setDate} />
+            <DatePicker value={date} onChange={setDate} minDate={new Date()} />
             <div>
               <Text size="sm" mb={4}>Start time</Text>
               <TimePicker value={startTime} onChange={setStartTime} />
