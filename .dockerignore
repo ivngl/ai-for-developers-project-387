@@ -1,0 +1,14 @@
+node_modules/
+.git/
+.gitignore
+*.db
+dist/
+client/dist/
+server/dist/
+test-results/
+playwright-report/
+e2e/
+.github/
+*.md
+.env
+.env.*
