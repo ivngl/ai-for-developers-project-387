@@ -49,6 +49,15 @@ router.post('/', adminAuth, async (req: Request, res: Response) => {
     }
   }
 
+  if (date && startTime) {
+    const conflicting = await prisma.eventType.findFirst({
+      where: { date, startTime },
+    })
+    if (conflicting) {
+      return res.status(409).json({ error: 'An event type already exists at this date and time' })
+    }
+  }
+
   const eventType = await prisma.eventType.create({
     data: {
       title: title.trim(),
@@ -117,6 +126,15 @@ router.put('/:id', adminAuth, async (req: Request, res: Response) => {
         }
       }
       data.startTime = startTime
+    }
+  }
+
+  if (data.date && data.startTime) {
+    const conflicting = await prisma.eventType.findFirst({
+      where: { date: data.date as string, startTime: data.startTime as string, NOT: { id } },
+    })
+    if (conflicting) {
+      return res.status(409).json({ error: 'An event type already exists at this date and time' })
     }
   }
 
