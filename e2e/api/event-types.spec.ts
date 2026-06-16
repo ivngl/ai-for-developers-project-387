@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { cleanDb } from '../helpers'
+import { API_BASE_URL } from '../config'
 
-const API = 'http://localhost:3001'
+const API = API_BASE_URL
 
 test.beforeEach(async ({ request }) => {
   await cleanDb(request)

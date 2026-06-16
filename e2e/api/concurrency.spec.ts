@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { cleanDb, futureDateStr } from '../helpers'
+import { API_BASE_URL } from '../config'
 
-const API = 'http://localhost:3001'
+const API = API_BASE_URL
 const dateStr = futureDateStr(2)
 
 test.beforeEach(async ({ request }) => {

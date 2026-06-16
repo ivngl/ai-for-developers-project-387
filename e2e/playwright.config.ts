@@ -1,13 +1,12 @@
 import { defineConfig } from '@playwright/test'
-
-const PORT = process.env.PORT || '3001'
+import { API_BASE_URL } from './config'
 
 export default defineConfig({
   testDir: './',
   globalSetup: './global-setup',
   workers: 1,
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: API_BASE_URL,
     trace: 'on-first-retry',
   },
 })

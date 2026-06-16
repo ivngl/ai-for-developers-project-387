@@ -1,4 +1,5 @@
 import type { APIRequestContext } from '@playwright/test'
+import { API_BASE_URL } from './config'
 
 export function localDateStr(date: Date = new Date()): string {
   const y = date.getFullYear()
@@ -13,15 +14,12 @@ export function futureDateStr(daysFromNow: number = 2): string {
   return localDateStr(d)
 }
 
-const PORT = process.env.PORT || '3001'
-const API = `http://localhost:${PORT}`
-
 export async function cleanDb(request: APIRequestContext) {
-  const login = await request.post(`${API}/api/admin/login`, {
+  const login = await request.post(`${API_BASE_URL}/api/admin/login`, {
     data: { password: 'admin123' },
   })
   const { token } = await login.json()
-  await request.delete(`${API}/api/admin/reset`, {
+  await request.delete(`${API_BASE_URL}/api/admin/reset`, {
     headers: { Authorization: `Bearer ${token}` },
   })
 }
