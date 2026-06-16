@@ -187,6 +187,7 @@ test('admin can log out', async ({ page }) => {
   await expect(page).toHaveURL('/admin/login')
 
   await page.goto('/admin')
+  await page.waitForURL('/admin/login')
   await expect(page.getByText('Admin Login')).toBeVisible()
 })
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { loginAdmin } from '../api/admin'
 import { Container, Paper, Title, PasswordInput, Button, Alert } from '@mantine/core'
 
@@ -8,6 +8,11 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const token = localStorage.getItem('admin_token')
+  if (token) {
+    return <Navigate to="/admin" replace />
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -1,5 +1,4 @@
-import { useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { Container, Group, Anchor, Title, Button } from '@mantine/core'
 
@@ -8,13 +7,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const location = useLocation()
   const token = localStorage.getItem('admin_token')
 
-  useEffect(() => {
-    if (!token) {
-      navigate('/admin/login', { replace: true })
-    }
-  }, [token, navigate])
-
-  if (!token) return null
+  if (!token) {
+    return <Navigate to="/admin/login" replace />
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token')
