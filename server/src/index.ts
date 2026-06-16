@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import express from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -30,6 +30,11 @@ const clientDist = path.resolve(__dirname, '../../client/dist')
 app.use(express.static(clientDist))
 app.get('*', (_req, res) => {
   res.sendFile(path.join(clientDist, 'index.html'))
+})
+
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error('Unhandled error:', err)
+  res.status(500).json({ error: 'Internal server error' })
 })
 
 app.listen(port, () => {

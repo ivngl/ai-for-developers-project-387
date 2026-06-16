@@ -25,6 +25,11 @@ jobs:
         env:
           DATABASE_URL: file:./dev.db
 
+      - name: Push Prisma schema
+        run: npm run db:push -w server
+        env:
+          DATABASE_URL: file:./dev.db
+
       - name: Install Playwright chromium
         run: npx playwright install chromium
 
