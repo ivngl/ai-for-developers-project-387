@@ -37,13 +37,14 @@ jobs:
         run: |
           cd server && npx tsx src/index.ts &
           sleep 3
-          curl --retry 5 --retry-delay 2 --retry-connrefused http://localhost:3001/api/health
+          curl --retry 5 --retry-delay 2 --retry-connrefused http://localhost:${{ vars.PORT || '3001' }}/api/health
         env:
           DATABASE_URL: file:./dev.db
           ADMIN_PASSWORD: admin123
           JWT_SECRET: test-secret-key
           WORK_HOURS_START: 9
           WORK_HOURS_END: 18
+          PORT: ${{ vars.PORT || '3001' }}
 
       - name: Start client
         run: |
@@ -59,10 +60,11 @@ jobs:
           JWT_SECRET: test-secret-key
           WORK_HOURS_START: 9
           WORK_HOURS_END: 18
+          PORT: ${{ vars.PORT || '3001' }}
 
       - name: Cleanup
         if: always()
-        run: kill $(lsof -t -i:3001) $(lsof -t -i:5173) 2>/dev/null || true
+        run: kill $(lsof -t -i:${{ vars.PORT || '3001' }}) $(lsof -t -i:5173) 2>/dev/null || true
 
       - uses: actions/upload-artifact@v4
         if: failure()

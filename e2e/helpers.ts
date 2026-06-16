@@ -13,12 +13,15 @@ export function futureDateStr(daysFromNow: number = 2): string {
   return localDateStr(d)
 }
 
+const PORT = process.env.PORT || '3001'
+const API = `http://localhost:${PORT}`
+
 export async function cleanDb(request: APIRequestContext) {
-  const login = await request.post('http://localhost:3001/api/admin/login', {
+  const login = await request.post(`${API}/api/admin/login`, {
     data: { password: 'admin123' },
   })
   const { token } = await login.json()
-  await request.delete('http://localhost:3001/api/admin/reset', {
+  await request.delete(`${API}/api/admin/reset`, {
     headers: { Authorization: `Bearer ${token}` },
   })
 }

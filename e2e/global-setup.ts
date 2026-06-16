@@ -1,4 +1,5 @@
-const API = 'http://localhost:3001'
+const PORT = process.env.PORT || '3001'
+const API = `http://localhost:${PORT}`
 
 export default async function globalSetup() {
   const login = await fetch(`${API}/api/admin/login`, {
