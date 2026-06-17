@@ -1,0 +1,55 @@
+name: lighthouse
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run db:generate -w server
+        env:
+          DATABASE_URL: file:./dev.db
+
+      - name: Build client
+        run: npm run build -w client
+
+      - name: Start production server
+        run: |
+          cd server && npx tsx src/index.ts &
+          sleep 3
+          curl --retry 5 --retry-connrefused http://localhost:3001/api/health
+        env:
+          PORT: 3001
+          DATABASE_URL: file:./dev.db
+          ADMIN_PASSWORD: admin123
+          JWT_SECRET: test-secret-key
+
+      - name: Run Lighthouse audit
+        run: npx lhci autorun
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          retention-days: 7
