@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.0.0 (2026-06-17)
+
+
+### Features
+
+* add active link highlighting to navigation ([7842ea3](https://github.com/ivngl/ai-for-developers-project-387/commit/7842ea37bf4db2325af9fa3b36067240daf40fab))
+* add event types, booking slots, admin auth, calendar UI, and TypeSpec spec ([27aee07](https://github.com/ivngl/ai-for-developers-project-387/commit/27aee07d813be3b943a8f597404fd377feb783c0))
+* add OpenCode GitHub integration workflow ([01087b0](https://github.com/ivngl/ai-for-developers-project-387/commit/01087b08d7749bb1a0359da6b10480c2a29ee37b))
+* prevent creating events in the past ([76edc5c](https://github.com/ivngl/ai-for-developers-project-387/commit/76edc5cbce48290040639f801ac9a8335418da7f))
+* replace raw CSS with Mantine v7 UI library ([292bc32](https://github.com/ivngl/ai-for-developers-project-387/commit/292bc32694fbba9d5bf596baaeac06d50538d9f8))
+* scaffold project with React + Vite client and Express + Prisma server ([41e663e](https://github.com/ivngl/ai-for-developers-project-387/commit/41e663ebe8df0eb8b704167de83d477d3c5890f5))
+* use PORT from env in e2e config and CI workflow ([7ea416a](https://github.com/ivngl/ai-for-developers-project-387/commit/7ea416a6f04d2babd92aa684aa0e80eaf8b0c8a9))
+
+
+### Bug Fixes
+
+* add db schema push to CI and error handling middleware ([1c5e0a7](https://github.com/ivngl/ai-for-developers-project-387/commit/1c5e0a795f6b89ce1d1888fc002a585909e98843))
+* add PORT to .env ([e7cba13](https://github.com/ivngl/ai-for-developers-project-387/commit/e7cba139f69ac78236935891e6ec4c2cfd5b2263))
+* allow /dev/* external directory access for CI ([93ee7ad](https://github.com/ivngl/ai-for-developers-project-387/commit/93ee7adb566b378613aef323ee31a7087f9ad22a))
+* build client before e2e tests in CI ([00f4729](https://github.com/ivngl/ai-for-developers-project-387/commit/00f4729a80b6f96269c268eff33328ddff1ee045))
+* change model to minimax ([6efafba](https://github.com/ivngl/ai-for-developers-project-387/commit/6efafba6fd409a17a03be835c524f4f43fc5cf44))
+* configure git identity in workflow for opencode commits ([5a68ade](https://github.com/ivngl/ai-for-developers-project-387/commit/5a68adec304c78ae2109f91d9cb5859d1b0abd85))
+* fix e2e test config, server crashes, and flaky concurrency ([856ecc0](https://github.com/ivngl/ai-for-developers-project-387/commit/856ecc00b7262b9a9720a822b29e8ddf315927fb))
+* grant write permissions and pass GITHUB_TOKEN to OpenCode action ([327a3cf](https://github.com/ivngl/ai-for-developers-project-387/commit/327a3cfed9b6871928dcd6a3dbf60ea6968013a0))
+* pass GITHUB_TOKEN for use_github_token ([cef0898](https://github.com/ivngl/ai-for-developers-project-387/commit/cef0898b506c206a7f547747e688b0d4403d5ed3))
+* pin opencode action to v1.17.7 and add write permissions ([6ed067d](https://github.com/ivngl/ai-for-developers-project-387/commit/6ed067dd591f8afdb82545c2ecfa764500da3c20))
+* remove use_github_token in favor of OpenCode app auth ([cfb2bd0](https://github.com/ivngl/ai-for-developers-project-387/commit/cfb2bd0e7da3b9a8d7ca548cee945739c958f880))
+* replace useEffect redirect with declarative Navigate in AdminLayout ([82acaf1](https://github.com/ivngl/ai-for-developers-project-387/commit/82acaf1a9013583f3fca8e82aaf0ab734b698893))
+* resolve test isolation, state leakage, and booking/slot scoping bugs ([f50e56b](https://github.com/ivngl/ai-for-developers-project-387/commit/f50e56b5268adeda0047eaaa44e8a6e86ca524ec))
+* revert 127.0.0.1 back to localhost, use vite --host in CI ([79227de](https://github.com/ivngl/ai-for-developers-project-387/commit/79227de84a59b2a81f3458b470c4d6c1bf3ba995))
+* switch model to big-pickle ([f5c566b](https://github.com/ivngl/ai-for-developers-project-387/commit/f5c566b0b6540388ba41592b038aed7276ba29e8))
+* switch to faster deepseek-v4-flash-free model ([e9c9c12](https://github.com/ivngl/ai-for-developers-project-387/commit/e9c9c1235a49e21f5f05bb1f183c3de126351dba))
+* tests ([04f8a4e](https://github.com/ivngl/ai-for-developers-project-387/commit/04f8a4e3baf6d9c5c477451f753a38fdec429983))
+* update delete-with-bookings test to expect error message ([2ef705a](https://github.com/ivngl/ai-for-developers-project-387/commit/2ef705a75d26f1f037d034c2c1416a83e4ec6c9c))
+* use GITHUB_TOKEN via use_github_token: true instead of secrets.GITHUB_TOKEN ([16dd240](https://github.com/ivngl/ai-for-developers-project-387/commit/16dd240075cd85f2633f8bb411247aa36c80e280))
+* use PAT instead of GITHUB_TOKEN for release-please ([bea8304](https://github.com/ivngl/ai-for-developers-project-387/commit/bea830407bdda494214deb2a84d34338abfd31c4))
+
 ## [1.1.0](https://github.com/ivngl/ai-for-developers-project-386/compare/v1.0.0...v1.1.0) (2026-06-16)
 
 
