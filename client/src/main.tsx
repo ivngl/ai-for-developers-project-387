@@ -14,7 +14,7 @@ import AdminEventTypeFormPage from './pages/AdminEventTypeFormPage'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MantineProvider>
+    <MantineProvider defaultColorScheme="auto">
       <Notifications />
       <BrowserRouter>
         <Routes>
