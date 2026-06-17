@@ -59,6 +59,16 @@ DELETE /api/events/:id
 - React components: functional + hooks, no class components
 - File/folder naming: kebab-case for files, PascalCase for components
 
+## Commit Convention
+Use [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:` — new feature
+- `fix:` — bug fix
+- `chore:` — tooling, infra, deps
+- `refactor:` — code change with no feature/fix
+- `docs:` — documentation only
+- `test:` — adding or fixing tests
+- `style:` — formatting, missing semicolons, etc.
+
 ## Dev Commands
 | Command | Location | Action |
 |---------|----------|--------|
