@@ -1,0 +1,68 @@
+name: opencode-scheduled
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run db:generate -w server
+        env:
+          DATABASE_URL: file:./dev.db
+
+      - name: Build client
+        run: npm run build -w client
+
+      - name: Start production server
+        run: |
+          cd server && npx tsx src/index.ts &
+          sleep 3
+          curl --retry 5 --retry-connrefused http://localhost:3001/api/health
+        env:
+          PORT: 3001
+          DATABASE_URL: file:./dev.db
+          ADMIN_PASSWORD: admin123
+          JWT_SECRET: test-secret-key
+
+      - name: Run Lighthouse audit
+        run: npx lhci autorun
+
+      - name: Analyze results with opencode
+        uses: anomalyco/opencode/github@v1.17.7
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        with:
+          model: opencode/big-pickle
+          prompt: |
+            Review the Lighthouse report in .lighthouseci/ directory.
+            Check performance, accessibility, best-practices, and SEO scores.
+            If any score dropped below 0.9, create a GitHub issue
+            summarizing the regressions and suggesting concrete fixes.
+            If all scores are above 0.9, do nothing.
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-nightly-report
+          path: .lighthouseci/
+          retention-days: 7
