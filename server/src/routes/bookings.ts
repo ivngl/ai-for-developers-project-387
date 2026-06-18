@@ -8,7 +8,7 @@ class ConflictError extends Error {
 
 const router = Router()
 
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response, next) => {
   const { eventTypeId, startTime, endTime, guestName, guestEmail } = req.body
 
   if (!eventTypeId || typeof eventTypeId !== 'number') {
@@ -72,7 +72,7 @@ router.post('/', async (req: Request, res: Response) => {
     if (err instanceof ConflictError) {
       return res.status(409).json({ error: err.message })
     }
-    throw err
+    return next(err)
   }
 })
 

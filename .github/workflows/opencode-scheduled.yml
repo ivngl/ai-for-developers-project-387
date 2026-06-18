@@ -45,7 +45,7 @@ jobs:
           JWT_SECRET: test-secret-key
 
       - name: Run Lighthouse audit
-        run: npx lhci autorun
+        run: npx lhci collect && npx lhci assert
 
       - name: Analyze results with opencode
         uses: anomalyco/opencode/github@v1.17.7

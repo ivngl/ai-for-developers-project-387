@@ -44,6 +44,8 @@ export default function AdminEventTypeFormPage() {
         setDate(stringToDate(found.date))
         setStartTime(found.startTime)
       }
+    }).catch((e: Error) => {
+      setError(e.message)
     })
   }, [id, isEdit])
 
