@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/ivngl/ai-for-developers-project-387/compare/v1.0.0...v1.1.0) (2026-06-17)
+
+
+### Features
+
+* add Lighthouse CI audit with desktop preset ([dafc56b](https://github.com/ivngl/ai-for-developers-project-387/commit/dafc56b11ff0ff32afabffdb4086a927b8e34df8))
+* add nightly Lighthouse audit with opencode analysis ([da7ee17](https://github.com/ivngl/ai-for-developers-project-387/commit/da7ee177bb1c688a212bcf4ad4bef8b325d3a5c8))
+
 ## 1.0.0 (2026-06-17)
 
 
