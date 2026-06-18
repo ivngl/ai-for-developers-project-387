@@ -1,5 +1,8 @@
 # Simple Cal
 
+### Hexlet tests and linter status:
+[![Actions Status](https://github.com/ivngl/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/ivngl/ai-for-developers-project-387/actions)
+
 Calendar scheduling web app — simplified [cal.com](https://cal.com). Users can register, create events (time slots), and share availability.
 
 ## Tech Stack
@@ -55,6 +58,3 @@ npm run dev
 | POST | `/api/events` | Create an event |
 | PUT | `/api/events/:id` | Update an event |
 | DELETE | `/api/events/:id` | Delete an event |
-
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/ivngl/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/ivngl/ai-for-developers-project-387/actions)
