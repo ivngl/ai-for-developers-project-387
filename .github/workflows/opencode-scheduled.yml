@@ -71,18 +71,34 @@ jobs:
           path: lighthouse-report.html
           retention-days: 7
 
-      - name: Analyze results with opencode
-        uses: anomalyco/opencode/github@v1.17.7
+      - name: Create issues for low scores
+        run: |
+          json_report=$(ls .lighthouseci/lhr-*.json 2>/dev/null | head -1)
+          if [ -n "$json_report" ]; then
+            node -e "
+              const fs = require('fs');
+              const r = JSON.parse(fs.readFileSync('$json_report', 'utf8'));
+              const categories = r.categories;
+              let created = 0;
+              for (const [key, cat] of Object.entries(categories)) {
+                if (cat.score < 0.9) {
+                  const pct = Math.round(cat.score * 100);
+                  const title = '[Lighthouse] ' + cat.title + ' score: ' + pct + '%';
+                  const body = '## ' + cat.title + ' score dropped to ' + pct + '%\n\nThreshold: 90%\n\nSee the lighthouse-html-report artifact for full details.';
+                  require('child_process').execSync(
+                    'gh issue create --title \"' + title + '\" --body \"' + body.replace(/\"/g, '\\\\\"') + '\"',
+                    { stdio: 'inherit' }
+                  );
+                  created++;
+                }
+              }
+              if (created === 0) console.log('All scores >= 0.9, no issues created');
+            "
+          else
+            echo "No JSON report found"
+          fi
         env:
-          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-        with:
-          model: opencode/big-pickle
-          prompt: |
-            Review the Lighthouse report in .lighthouseci/ directory.
-            Check performance, accessibility, best-practices, and SEO scores.
-            If any score dropped below 0.9, create a GitHub issue
-            summarizing the regressions and suggesting concrete fixes.
-            If all scores are above 0.9, do nothing.
+          GH_TOKEN: ${{ github.token }}
 
       - uses: actions/upload-artifact@v4
         if: always()
