@@ -40,11 +40,12 @@ router.get('/', async (req: Request, res: Response) => {
 
   const { start: workStart, end: workEnd } = getWorkHours()
   const slotDuration = eventType.duration
+  const tzOffset = parseInt(req.query.tzOffset as string, 10) || 0
 
   const dayStart = new Date(requested)
-  dayStart.setUTCHours(workStart, 0, 0, 0)
+  dayStart.setUTCMinutes(workStart * 60 + tzOffset, 0, 0)
   const dayEnd = new Date(requested)
-  dayEnd.setUTCHours(workEnd, 0, 0, 0)
+  dayEnd.setUTCMinutes(workEnd * 60 + tzOffset, 0, 0)
 
   const existingBookings = await prisma.booking.findMany({
     where: {
@@ -63,7 +64,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
     const [hours, minutes] = eventType.startTime.split(':').map(Number)
     const slotStart = new Date(requested)
-    slotStart.setUTCHours(hours, minutes, 0, 0)
+    slotStart.setUTCMinutes(hours * 60 + minutes + tzOffset, 0, 0)
     const slotEnd = new Date(slotStart.getTime() + slotDuration * 60000)
 
     const isBooked = existingBookings.some(

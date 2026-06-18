@@ -22,7 +22,8 @@ export function getSlots(
   eventTypeId: number,
   date: string
 ): Promise<Slot[]> {
-  return apiRequest(`/slots?eventTypeId=${eventTypeId}&date=${date}`)
+  const tzOffset = new Date().getTimezoneOffset()
+  return apiRequest(`/slots?eventTypeId=${eventTypeId}&date=${date}&tzOffset=${tzOffset}`)
 }
 
 export function createBooking(data: {
