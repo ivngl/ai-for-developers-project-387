@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/ivngl/ai-for-developers-project-387/compare/v1.1.0...v1.1.1) (2026-06-18)
+
+
+### Bug Fixes
+
+* invalid Lighthouse CI preset in .lighthouserc.json ([9c1466c](https://github.com/ivngl/ai-for-developers-project-387/commit/9c1466c736d46aa5e47cc330ff658debf9ea957c))
+* split lhci autorun into collect+assert to skip error-prone upload step ([50d2a8d](https://github.com/ivngl/ai-for-developers-project-387/commit/50d2a8d27078f93973106b7b1564c4d1bdcb38c3))
+
 ## [1.1.0](https://github.com/ivngl/ai-for-developers-project-387/compare/v1.0.0...v1.1.0) (2026-06-17)
 
 
