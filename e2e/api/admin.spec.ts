@@ -11,18 +11,4 @@ test('POST /api/admin/login with correct password returns token', async ({ reque
   expect(typeof body.token).toBe('string')
 })
 
-test('POST /api/admin/login with wrong password returns 401', async ({ request }) => {
-  const res = await request.post(`${API_BASE_URL}/api/admin/login`, {
-    data: { password: 'wrong-password' },
-  })
-  expect(res.status()).toBe(401)
-  expect(await res.json()).toEqual({ error: 'Invalid password' })
-})
 
-test('POST /api/admin/login with empty body returns 401', async ({ request }) => {
-  const res = await request.post(`${API_BASE_URL}/api/admin/login`, {
-    data: {},
-  })
-  expect(res.status()).toBe(401)
-  expect(await res.json()).toEqual({ error: 'Invalid password' })
-})

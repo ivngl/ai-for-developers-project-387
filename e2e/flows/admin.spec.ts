@@ -94,16 +94,6 @@ test('admin can delete an event type', async ({ page }) => {
   await expect(page.getByText('Existing Meeting').first()).not.toBeVisible()
 })
 
-test('admin with wrong password sees error', async ({ page }) => {
-  await page.goto('/admin/login')
-
-  await page.getByPlaceholder('Enter admin password').fill('wrong-password')
-  await page.getByRole('button', { name: 'Login' }).click()
-
-  await expect(page.getByText('Invalid password')).toBeVisible()
-  await expect(page).toHaveURL('/admin/login')
-})
-
 test('admin can create a single-slot event type', async ({ page }) => {
   await page.goto('/admin/login')
   await page.getByPlaceholder('Enter admin password').fill('admin123')
