@@ -52,7 +52,7 @@ jobs:
         run: |
           json_report=$(ls .lighthouseci/lhr-*.json 2>/dev/null | head -1)
           if [ -n "$json_report" ]; then
-            npx -p lighthouse -c "
+            npx -p lighthouse node -e "
               const fs = require('fs');
               const lh = require('lighthouse');
               const json = JSON.parse(fs.readFileSync('$json_report', 'utf8'));
