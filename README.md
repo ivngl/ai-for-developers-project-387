@@ -23,14 +23,11 @@ npm install
 # Set up environment variables
 cp server/.env.example server/.env
 
-# Push database schema
-npm run db:push -w server
-
-# Generate Prisma client
-npm run db:generate -w server
+# Full setup (install deps, generate Prisma client, push schema)
+make setup
 
 # Start both client and server in dev mode
-npm run dev
+make dev
 ```
 
 - Client runs at **http://localhost:5173**
@@ -40,13 +37,13 @@ npm run dev
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start client + server concurrently |
-| `npm run build` | Build both client and server |
-| `npm run lint` | Type-check both workspaces |
-| `npm run db:push -w server` | Push schema to SQLite |
-| `npm run db:generate -w server` | Generate Prisma client |
-| `npm run db:studio -w server` | Open Prisma Studio |
-| `npm run test:e2e` | Run Playwright e2e tests |
+| `make dev` | Start client + server concurrently |
+| `make build` | Build both client and server |
+| `make lint` | Type-check both workspaces |
+| `make db-push` | Push schema to SQLite |
+| `make db-generate` | Generate Prisma client |
+| `make db-studio` | Open Prisma Studio |
+| `make test` | Run Playwright e2e tests |
 
 ## API Endpoints
 
