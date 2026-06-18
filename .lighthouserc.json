@@ -10,7 +10,8 @@
           "accessibility",
           "best-practices",
           "seo"
-        ]
+        ],
+        "output": ["html", "json"]
       }
     },
     "assert": {
