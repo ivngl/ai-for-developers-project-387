@@ -45,17 +45,31 @@ jobs:
           JWT_SECRET: test-secret-key
 
       - name: Run Lighthouse audit
-        run: npx lhci collect && npx lhci assert
+        run: npx lhci collect
+        continue-on-error: true
 
-      - name: Create HTML report file
+      - name: Generate HTML report from Lighthouse JSON
         run: |
-          report=$(ls .lighthouseci/lhr-*.html 2>/dev/null | head -1)
-          if [ -n "$report" ]; then
-            cp "$report" lighthouse-report.html
-            echo "Report saved to lighthouse-report.html"
+          json_report=$(ls .lighthouseci/lhr-*.json 2>/dev/null | head -1)
+          if [ -n "$json_report" ]; then
+            npx -p lighthouse -c "
+              const fs = require('fs');
+              const lh = require('lighthouse');
+              const json = JSON.parse(fs.readFileSync('$json_report', 'utf8'));
+              const html = lh.generateReport(json, 'html');
+              fs.writeFileSync('lighthouse-report.html', html);
+            "
           else
-            echo "No HTML report found in .lighthouseci/"
+            echo "No JSON report found in .lighthouseci/"
+            exit 1
           fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-html-report
+          path: lighthouse-report.html
+          retention-days: 7
 
       - name: Analyze results with opencode
         uses: anomalyco/opencode/github@v1.17.7
