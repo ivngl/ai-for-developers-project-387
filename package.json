@@ -11,8 +11,8 @@
     "build": "npm run build -w client && npm run build -w server",
     "lint": "npm run lint -w client && npm run lint -w server",
     "test:e2e": "playwright test --config=e2e/playwright.config.ts",
-    "lighthouse": "lhci autorun",
-    "lighthouse:ci": "lhci autorun --collect.url=http://localhost:3001"
+    "lighthouse": "lhci collect && lhci assert",
+    "lighthouse:ci": "lhci collect --collect.url=http://localhost:3001 && lhci assert"
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",

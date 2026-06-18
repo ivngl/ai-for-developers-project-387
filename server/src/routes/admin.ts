@@ -19,9 +19,13 @@ router.post('/login', (req: Request, res: Response) => {
 })
 
 router.delete('/reset', adminAuth, async (_req: Request, res: Response) => {
-  await prisma.booking.deleteMany()
-  await prisma.eventType.deleteMany()
-  return res.json({ status: 'ok' })
+  try {
+    await prisma.booking.deleteMany()
+    await prisma.eventType.deleteMany()
+    return res.json({ status: 'ok' })
+  } catch {
+    return res.status(500).json({ error: 'Reset failed' })
+  }
 })
 
 export default router
