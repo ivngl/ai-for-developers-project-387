@@ -27,7 +27,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </Anchor>
         <Group gap="md">
           <Anchor component={Link} to="/admin" fw={location.pathname === '/admin' ? 700 : 400}>Dashboard</Anchor>
-          <Anchor component={Link} to="/admin/event-types/new" fw={location.pathname === '/admin/event-types/new' ? 700 : 400}>New Event Type</Anchor>
           <Anchor component={Link} to="/" fw={location.pathname === '/' ? 700 : 400}>View Public Page</Anchor>
           <ActionIcon onClick={toggleColorScheme} variant="default" size="lg" aria-label="Toggle color scheme">
             {colorScheme === 'dark' ? <IconSun /> : <IconMoon />}

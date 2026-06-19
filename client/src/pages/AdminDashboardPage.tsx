@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { getEventTypes, deleteEventType } from '../api/eventTypes'
 import { getBookings } from '../api/bookings'
 import type { EventType } from '../api/eventTypes'
 import type { Booking } from '../api/bookings'
 import AdminLayout from '../components/AdminLayout'
 import EventTypeCard from '../components/EventTypeCard'
-import { Title, SimpleGrid, Table, Loader, Alert, Text } from '@mantine/core'
+import { Title, SimpleGrid, Table, Loader, Alert, Text, Button, Group } from '@mantine/core'
 
 export default function AdminDashboardPage() {
   const [eventTypes, setEventTypes] = useState<EventType[]>([])
@@ -47,7 +48,10 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <Title order={2} mb="md">Event Types</Title>
+      <Group justify="space-between" mb="md">
+        <Title order={2}>Event Types</Title>
+        <Button component={Link} to="/admin/event-types/new">New Event Type</Button>
+      </Group>
       {eventTypes.length === 0 && <Text>No event types yet.</Text>}
       <SimpleGrid cols={{ base: 1, sm: 2 }}>
         {eventTypes.map((et) => (
