@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.2.0](https://github.com/ivngl/ai-for-developers-project-387/compare/v1.1.1...v1.2.0) (2026-06-19)
+
+
+### Features
+
+* add endTime to event types for availability windows ([fd3e837](https://github.com/ivngl/ai-for-developers-project-387/commit/fd3e83718db4271c9ab02bf3f30e7ab6d1150fd8))
+
+
+### Bug Fixes
+
+* **lighthouse:** generate HTML report from JSON instead of looking for .html files ([475932a](https://github.com/ivngl/ai-for-developers-project-387/commit/475932aaf4741bcf2fa50782d43c4a7b2bcac58f))
+* **opencode-scheduled:** generate HTML report from JSON instead of looking for .html files ([dd598d2](https://github.com/ivngl/ai-for-developers-project-387/commit/dd598d2710b977e018243b155b32932af9fb2070))
+* **opencode-scheduled:** replace opencode step with deterministic issue creation from JSON scores ([50db132](https://github.com/ivngl/ai-for-developers-project-387/commit/50db1320603baa5e5820f6a343e5cbefd037cac3))
+* pass timezone offset from client to server for correct slot display ([1b4f0cb](https://github.com/ivngl/ai-for-developers-project-387/commit/1b4f0cbb159b616f5db78fe7fee553973008155d))
+* use node -e instead of -c for Lighthouse HTML generation ([4dc54ef](https://github.com/ivngl/ai-for-developers-project-387/commit/4dc54efca94a5e80dd1cf68d30897b6f62c47ff5))
+
 ## [1.1.1](https://github.com/ivngl/ai-for-developers-project-387/compare/v1.1.0...v1.1.1) (2026-06-18)
 
 
