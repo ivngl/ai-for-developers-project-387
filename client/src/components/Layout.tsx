@@ -20,8 +20,8 @@ export default function Layout({ children }: { children: ReactNode }) {
           </ActionIcon>
         </Group>
         <Group gap="md" mt="xs">
-          <Anchor component={Link} to="/" fw={location.pathname === '/' ? 700 : 400}>Home</Anchor>
-          <Anchor component={Link} to="/admin/login" fw={location.pathname.startsWith('/admin') ? 700 : 400}>Admin</Anchor>
+          <Anchor component={Link} to="/" underline={location.pathname === '/' ? 'always' : 'hover'}>Home</Anchor>
+          <Anchor component={Link} to="/admin/login" underline={location.pathname.startsWith('/admin') ? 'always' : 'hover'}>Admin</Anchor>
         </Group>
       </header>
       <main>{children}</main>

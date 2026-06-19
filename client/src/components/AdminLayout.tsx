@@ -26,8 +26,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <Title order={1}>Admin Panel</Title>
         </Anchor>
         <Group gap="md">
-          <Anchor component={Link} to="/admin" fw={location.pathname === '/admin' ? 700 : 400}>Dashboard</Anchor>
-          <Anchor component={Link} to="/" fw={location.pathname === '/' ? 700 : 400}>View Public Page</Anchor>
+          <Anchor component={Link} to="/admin" underline={location.pathname === '/admin' ? 'always' : 'hover'}>Dashboard</Anchor>
+          <Anchor component={Link} to="/" underline={location.pathname === '/' ? 'always' : 'hover'}>Home</Anchor>
           <ActionIcon onClick={toggleColorScheme} variant="default" size="lg" aria-label="Toggle color scheme">
             {colorScheme === 'dark' ? <IconSun /> : <IconMoon />}
           </ActionIcon>
