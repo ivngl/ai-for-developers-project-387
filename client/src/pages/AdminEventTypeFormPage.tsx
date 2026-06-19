@@ -30,6 +30,7 @@ export default function AdminEventTypeFormPage() {
   const [duration, setDuration] = useState('30')
   const [date, setDate] = useState<Date | null>(null)
   const [startTime, setStartTime] = useState<string | null>(null)
+  const [endTime, setEndTime] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -43,6 +44,7 @@ export default function AdminEventTypeFormPage() {
         setDuration(String(found.duration))
         setDate(stringToDate(found.date))
         setStartTime(found.startTime)
+        setEndTime(found.endTime)
       }
     }).catch((e: Error) => {
       setError(e.message)
@@ -64,6 +66,7 @@ export default function AdminEventTypeFormPage() {
       if (dateStr && startTime) {
         body.date = dateStr
         body.startTime = startTime
+        if (endTime) body.endTime = endTime
       }
       if (isEdit) {
         await updateEventType(parseInt(id!, 10), body)
@@ -81,6 +84,7 @@ export default function AdminEventTypeFormPage() {
   const clearSchedule = () => {
     setDate(null)
     setStartTime(null)
+    setEndTime(null)
   }
 
   return (
@@ -118,8 +122,12 @@ export default function AdminEventTypeFormPage() {
           <Group gap="lg" mt="sm" align="flex-start">
             <DatePicker value={date} onChange={setDate} minDate={new Date()} />
             <div>
-              <Text size="sm" mb={4}>Start time</Text>
-              <TimePicker value={startTime} onChange={setStartTime} />
+              <Text size="sm" mb={4}>Availability</Text>
+              <Group gap="xs" align="flex-end">
+                <TimePicker value={startTime} onChange={setStartTime} />
+                <Text size="sm" c="dimmed" pb={6}>to</Text>
+                <TimePicker value={endTime} onChange={setEndTime} />
+              </Group>
             </div>
           </Group>
           {(date || startTime) && (

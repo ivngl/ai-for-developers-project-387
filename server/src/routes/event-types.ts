@@ -12,7 +12,7 @@ router.get('/', async (_req: Request, res: Response) => {
 })
 
 router.post('/', adminAuth, async (req: Request, res: Response) => {
-  const { title, description, duration, date, startTime } = req.body
+  const { title, description, duration, date, startTime, endTime } = req.body
 
   if (!title || typeof title !== 'string' || !title.trim()) {
     return res.status(400).json({ error: 'Title is required' })
@@ -43,6 +43,11 @@ router.post('/', adminAuth, async (req: Request, res: Response) => {
         return res.status(400).json({ error: 'Event time cannot be in the past' })
       }
     }
+    if (endTime) {
+      if (!/^\d{2}:\d{2}$/.test(endTime)) {
+        return res.status(400).json({ error: 'endTime must be in HH:mm format' })
+      }
+    }
   } else if (startTime) {
     if (!/^\d{2}:\d{2}$/.test(startTime)) {
       return res.status(400).json({ error: 'startTime must be in HH:mm format' })
@@ -65,6 +70,7 @@ router.post('/', adminAuth, async (req: Request, res: Response) => {
       duration,
       date: date || null,
       startTime: startTime || null,
+      endTime: endTime || null,
     },
   })
   return res.status(201).json(eventType)
@@ -81,7 +87,7 @@ router.put('/:id', adminAuth, async (req: Request, res: Response) => {
     return res.status(404).json({ error: 'Event type not found' })
   }
 
-  const { title, description, duration, date, startTime } = req.body
+  const { title, description, duration, date, startTime, endTime } = req.body
   const data: Record<string, unknown> = {}
   if (title !== undefined) {
     if (typeof title !== 'string' || !title.trim()) {
@@ -126,6 +132,12 @@ router.put('/:id', adminAuth, async (req: Request, res: Response) => {
         }
       }
       data.startTime = startTime
+    }
+    if (endTime !== undefined) {
+      if (endTime !== null && !/^\d{2}:\d{2}$/.test(endTime)) {
+        return res.status(400).json({ error: 'endTime must be in HH:mm format or null' })
+      }
+      data.endTime = endTime
     }
   }
 

@@ -58,23 +58,40 @@ router.get('/', async (req: Request, res: Response) => {
   const slots: { startTime: string; endTime: string; available: boolean }[] = []
 
   if (eventType.date && eventType.startTime) {
-    // single-slot event type — only return slot if date matches
+    // single-slot event type — only return slots if date matches
     if (dateStr !== eventType.date) {
       return res.json([])
     }
-    const [hours, minutes] = eventType.startTime.split(':').map(Number)
-    const slotStart = new Date(requested)
-    slotStart.setUTCMinutes(hours * 60 + minutes + tzOffset, 0, 0)
-    const slotEnd = new Date(slotStart.getTime() + slotDuration * 60000)
+    const [startHours, startMinutes] = eventType.startTime.split(':').map(Number)
+    const availStart = new Date(requested)
+    availStart.setUTCMinutes(startHours * 60 + startMinutes + tzOffset, 0, 0)
 
-    const isBooked = existingBookings.some(
-      (b) => slotStart < b.endTime && slotEnd > b.startTime
-    )
-    slots.push({
-      startTime: slotStart.toISOString(),
-      endTime: slotEnd.toISOString(),
-      available: !isBooked,
-    })
+    let availEnd: Date
+    if (eventType.endTime) {
+      const [endHours, endMinutes] = eventType.endTime.split(':').map(Number)
+      availEnd = new Date(requested)
+      availEnd.setUTCMinutes(endHours * 60 + endMinutes + tzOffset, 0, 0)
+    } else {
+      availEnd = new Date(availStart.getTime() + slotDuration * 60000)
+    }
+
+    let cursor = new Date(availStart)
+    while (cursor.getTime() + slotDuration * 60000 <= availEnd.getTime()) {
+      const slotStart = new Date(cursor)
+      const slotEnd = new Date(cursor.getTime() + slotDuration * 60000)
+
+      const isBooked = existingBookings.some(
+        (b) => slotStart < b.endTime && slotEnd > b.startTime
+      )
+
+      slots.push({
+        startTime: slotStart.toISOString(),
+        endTime: slotEnd.toISOString(),
+        available: !isBooked,
+      })
+
+      cursor = new Date(cursor.getTime() + slotDuration * 60000)
+    }
   } else {
     // template event type — generate all slots across business hours
     let cursor = new Date(dayStart)

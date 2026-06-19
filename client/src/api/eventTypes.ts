@@ -7,6 +7,7 @@ export interface EventType {
   duration: number
   date: string | null
   startTime: string | null
+  endTime: string | null
   createdAt: string
   updatedAt: string
 }
@@ -21,6 +22,7 @@ export function createEventType(data: {
   duration: number
   date?: string
   startTime?: string
+  endTime?: string
 }): Promise<EventType> {
   return apiRequest('/event-types', {
     method: 'POST',
@@ -36,6 +38,7 @@ export function updateEventType(
     duration?: number
     date?: string | null
     startTime?: string | null
+    endTime?: string | null
   }
 ): Promise<EventType> {
   return apiRequest(`/event-types/${id}`, {

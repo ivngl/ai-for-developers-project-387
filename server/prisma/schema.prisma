@@ -14,6 +14,7 @@ model EventType {
   duration    Int
   date        String?
   startTime   String?
+  endTime     String?
   bookings    Booking[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
