@@ -64,13 +64,6 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lighthouse-html-report
-          path: lighthouse-report.html
-          retention-days: 7
-
       - name: Create issues for low scores
         run: |
           json_report=$(ls .lighthouseci/lhr-*.json 2>/dev/null | head -1)
@@ -84,7 +77,7 @@ jobs:
                 if (cat.score < 0.9) {
                   const pct = Math.round(cat.score * 100);
                   const title = '[Lighthouse] ' + cat.title + ' score: ' + pct + '%';
-                  const body = '## ' + cat.title + ' score dropped to ' + pct + '%\n\nThreshold: 90%\n\nSee the lighthouse-html-report artifact for full details.';
+                  const body = '## ' + cat.title + ' score dropped to ' + pct + '%\n\nThreshold: 90%\n\nSee the lighthouse-nightly-report artifact for full details.';
                   require('child_process').execSync(
                     'gh issue create --title \"' + title + '\" --body \"' + body.replace(/\"/g, '\\\\\"') + '\"',
                     { stdio: 'inherit' }
